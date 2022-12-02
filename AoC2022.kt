@@ -17,8 +17,9 @@ fun main(args: Array<String>) {
 
     val start = System.nanoTime()
 
+    println("\nAoC 2022 - Day $yellow$bold${args[0]}$reset - File: $yellow${bold}d${args[0]}.${args[1]}.txt$reset")
     val kClass = Class.forName("com.sf.aoc2022.Day${args[0]}").kotlin
     kClass.members.filter { it.name == "solve" }[0].call( kClass.createInstance(), "data/d${args[0]}.${args[1]}.txt" )
 
-    println("\nElapsed time: $green${"%,d".format(System.nanoTime()-start)}$reset ns")
+    println("\nElapsed time: $green$bold${"%,d".format(System.nanoTime()-start)}$reset ns")
 }
