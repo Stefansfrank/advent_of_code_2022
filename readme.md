@@ -1,6 +1,6 @@
 # ADVENT OF CODE 2022
 
-This is the 8th year I am doing Advent of Code and the fourth year I do it in Kotlin. The solutions are all well documented and should be decently architected solutions. There are a few days where there are simple solutions possible but I might not have had the time to figure them out since it was brut force-able in reasonable time. Somehow this year I had more fun honing the performance than analysing the input file. However, there are days where analysis is the only way to a solution such as with part 2 the node network of computers moving around data.
+This is the 8th year I am doing Advent of Code and the fourth year I do it in Kotlin. The solutions are all well documented and should be decently architected solutions. 
 
 I have some reusable code blocks but did not encapsulate them into libraries so the idea is that every day can be independently run with the following in the same directory:
 - ```AoC2022.kt``` the main class that can call day n given as a command line parameter via reflection - see below how to avoid it if you run into problems with it as it might require build script changes for the reflection
