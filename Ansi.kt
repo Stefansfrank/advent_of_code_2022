@@ -1,4 +1,4 @@
-package com.sf.aoc2022
+package com.sf.aoc
 
 const val red   = "\u001b[31m"
 const val bold  = "\u001b[1m"

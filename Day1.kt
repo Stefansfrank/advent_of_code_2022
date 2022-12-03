@@ -1,5 +1,7 @@
 package com.sf.aoc2022
 
+import com.sf.aoc.*
+
 class Day1 : Solver {
 
     override fun solve(file: String) {

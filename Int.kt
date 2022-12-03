@@ -1,4 +1,4 @@
-package com.sf.aoc2022
+package com.sf.aoc
 
 import kotlin.math.sqrt
 

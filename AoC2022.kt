@@ -8,6 +8,7 @@ package com.sf.aoc2022
 // as long as the 'file' variable within is replaced with the filename of the input
 // (if there is an input file used)
 import kotlin.reflect.full.createInstance
+import com.sf.aoc.*
 
 interface Solver {
     fun solve(file: String)
@@ -19,7 +20,7 @@ fun main(args: Array<String>) {
 
     println("\nAoC 2022 - Day $yellow$bold${args[0]}$reset - File: $yellow${bold}d${args[0]}.${args[1]}.txt$reset")
     val kClass = Class.forName("com.sf.aoc2022.Day${args[0]}").kotlin
-    kClass.members.filter { it.name == "solve" }[0].call( kClass.createInstance(), "data/d${args[0]}.${args[1]}.txt" )
+    kClass.members.filter { it.name == "solve" }[0].call( kClass.createInstance(), "src/main/kotlin/Data/d${args[0]}.${args[1]}.txt" )
 
     println("\nElapsed time: $green$bold${"%,d".format(System.nanoTime()-start)}$reset ns")
 }

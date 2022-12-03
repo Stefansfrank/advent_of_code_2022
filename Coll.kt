@@ -1,4 +1,4 @@
-package com.sf.aoc2022
+package com.sf.aoc
 
 // this returns all possible subsets of 'list' with length 'len'
 fun <T> combinations(list: List<T>, len: Int):List<List<T>> {
