@@ -1,12 +1,11 @@
 package com.sf.aoc2022
 import  com.sf.aoc.*
 
-// This is a template to start new days quickly
 class Day4 : Solver {
 
     override fun solve(file: String) {
 
-        // result counters 
+        // result counters
         var sum1 = 0
         var sum2 = 0
 
