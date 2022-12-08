@@ -3,6 +3,7 @@ package com.sf.aoc
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.time.measureTimedValue
 
 // a point with coordinates c and y
 data class XY(val x: Int, val y: Int) {
@@ -90,6 +91,13 @@ class Mask(val xdim:Int, val ydim:Int, private val default:Boolean = false) {
         for (ln in msk) nMsk.add( ln.map{ it } )
         return nMsk
     }
+
+    // simple getters and setters using XY as coordinates
+    fun set(loc:XY, value:Boolean) { msk[loc.y][loc.x] = value }
+    fun get(loc:XY) = msk[loc.y][loc.x]
+    fun on(loc:XY)  = set(loc, true)
+    fun off(loc:XY) = set(loc, false)
+    fun tgl(loc:XY) = set(loc, !get(loc))
 }
 
 // a 2D integer map of dimensions xdim, ydim
@@ -119,8 +127,17 @@ class MapInt(val xdim:Int, val ydim:Int, private val default:Int = 0) {
     // adds all values of the map together
     fun cnt() = mp.fold(0) { acc, ln -> acc + ln.fold(0) { acc2, n -> acc2 + n } }
 
-    // adds a simple XY getter
+    // adds simple XY getter / setter
     fun get(xy:XY):Int = mp[xy.y][xy.x]
+    fun set(xy:XY, value:Int) { mp[xy.y][xy.x] = value }
+
+    // sets a line value
+    fun setLine(x:Int, ln:List<Int>) {
+       mp[x] = ln.toMutableList()
+    }
+
+    // prints out a representation to stdout
+    fun print() = mp.forEach { it.forEach{ i -> print(i) }; println() }
 }
 
 // a 2D integer map of dimensions xdim, ydim
