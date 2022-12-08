@@ -10,25 +10,28 @@ class Day7 : Solver {
         data class File(val name:String, val size:Int)
 
         // class representing a directory
+        // somewhat over-engineered maintaining path and file names etc.
+        // not all info is needed in order to solve the problem
         data class Dir(val name: String, val path: String, val parent: Dir?) {
             val files = mutableListOf<File>()
             val subDirs = HashMap<String, Dir>()
-            var size = 0
-            var rollupSize = 0
-            var total = 0
+            var size = 0        // the total size of files directly in this directory
+            var rollupSize = 0  // the total size of files in lower directories
+            var total = 0       // the sum of the above
 
-            // size adding
+            // size increases recompute totals
             fun addSize(value: Int) {
                 size  += value
                 total += value
             }
 
+            // rollupSize increases recompute totals
             fun addRollupSize(value: Int) {
                 rollupSize += value
                 total += value
             }
 
-            // recursive addition to rollup nested sizes
+            // recursive function to rollup native sizes
             fun addUpTree(value: Int) {
                 if (this.parent != null) {
                     this.parent.addRollupSize(value)
@@ -40,7 +43,7 @@ class Day7 : Solver {
         // reading input
         val data = readTxtFile(file)
 
-        // central representations (tree and flat list)
+        // central representations (tree root and flat list)
         val root = Dir("", "/", null)
         val dict = mutableListOf(root)
 
@@ -48,14 +51,14 @@ class Day7 : Solver {
         var curDir  = root // current directory
         for (ln in data) {
 
-            // take the first 4 letters to define the type of line we see
+            // take the first 4 letters to distinguish the type of line
             when (ln.take(4)) {
 
                 // change directory
                 "\$ cd"  -> curDir = when (val d = ln.substringAfter("cd ")) {
                     "/"  -> root
-                    ".." -> curDir.parent!!     // this assumes we never issue "cd.." on root
-                    else -> curDir.subDirs[d]!! // this assumes we only issue cd to directories already seen with ls!
+                    ".." -> curDir.parent!!     // this !! assumes we never issue "cd.." on root
+                    else -> curDir.subDirs[d]!! // this !! assumes we only issue cd to directories already seen with ls
                 }
 
                 // ls is a NOP line in terms of understanding the system
@@ -76,7 +79,7 @@ class Day7 : Solver {
             }
         }
 
-        // after parsing the whole tree, I rollup directory file-sizes to nested sizes of the parent directories
+        // after parsing the whole tree, I rollup directory level sizes to nested sizes of the parent directories
         dict.forEach { it.addUpTree(it.size) }
 
         // Part 1
