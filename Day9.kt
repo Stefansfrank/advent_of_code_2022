@@ -7,15 +7,15 @@ class Day9 : Solver {
 
         // reading input
         val data = readTxtFile(file)
-
+        
         // the rope simulator
-        // using sign to compute movement vector of tails
-        class Rope (val num:Int, var knts:Array<XY> = Array(num) {_ -> XY(0,0)}) {
+        class Rope (var knots:Array<XY>) {
+            constructor(num:Int): this(Array(num) {_ -> XY(0,0)})
             fun mv(dir: Int) {
-                knts[0] = knts[0].mv(dir)
-                (1 until num).forEach {
-                    val vec = knts[it - 1].sub(knts[it])
-                    if (vec.maxAbs() > 1) knts[it] = knts[it].add(vec.sign())
+                knots[0] = knots[0].mv(dir)
+                (1 until knots.size).forEach {
+                    val vec = knots[it - 1].sub(knots[it])
+                    if (vec.maxAbs() > 1) knots[it] = knots[it].add(vec.sign())
                 }
             }
         }
@@ -34,7 +34,7 @@ class Day9 : Solver {
             (1 .. cnt).forEach { _ ->
                 ropes.forEachIndexed() { ix, rp ->
                     rp.mv(dir)
-                    traces[ix].add(rp.knts.last())
+                    traces[ix].add(rp.knots.last())
                 }
             }
         }
