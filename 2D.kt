@@ -3,6 +3,7 @@ package com.sf.aoc
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.sign
 import kotlin.time.measureTimedValue
 
 // a point with coordinates c and y
@@ -10,6 +11,7 @@ data class XY(val x: Int, val y: Int) {
 
     // adds a vector to a point
     fun add(p:XY) = XY(x + p.x, y + p.y)
+    fun sub(p:XY) = XY( x - p.x, y - p.y)
 
     // returns the next point in the given direction
     // (0 = up, 1 = right, 2 = down, 3 = left)
@@ -33,6 +35,9 @@ data class XY(val x: Int, val y: Int) {
 
     fun mDist() = abs(x) + abs(y)
     fun mDist(p: XY) = abs(p.x - x) + abs(p.y - y)
+
+    fun maxAbs() = max(abs(x), abs(y))
+    fun sign() = XY(x.sign, y.sign)
 }
 
 // a rectangle defined with the corner points
