@@ -29,7 +29,7 @@ class Day10 : Solver {
         for (x in 0 until 40) {
             for (y in 0 until 6) {
                 val totIx = x + y*40
-                if (x in time[totIx]-1 .. time[totIx]+1) crt.on(XY(x,y))
+                if (x in time[totIx]-1 .. time[totIx]+1) crt.on(x,y)
             }
         }
 

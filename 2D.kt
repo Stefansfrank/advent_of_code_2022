@@ -4,7 +4,6 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sign
-import kotlin.time.measureTimedValue
 
 // a point with coordinates c and y
 data class XY(val x: Int, val y: Int) {
@@ -33,19 +32,28 @@ data class XY(val x: Int, val y: Int) {
         return List(if (diagonal) 8 else 4) { XY(x + delX[i], y + delY[i++]) }
     }
 
+    // Manhattan distance to origin or another point
     fun mDist() = abs(x) + abs(y)
     fun mDist(p: XY) = abs(p.x - x) + abs(p.y - y)
 
+    // The highest absolute coordinate value
     fun maxAbs() = max(abs(x), abs(y))
+
+    // The signum function for the whole point
     fun sign() = XY(x.sign, y.sign)
 }
 
 // a rectangle defined with the corner points
 data class Rect(val from:XY, val to:XY) {
 
-    // range functions for either direction enforcing from < to
-    fun xRange() = (min(from.x, to.x) .. max(from.x, to.x))
-    fun yRange() = (min(from.y, to.y) .. max(from.y, to.y))
+    // standardized from / to points enforcing from < to for each coordinate
+    private val stdFrom = XY(min(from.x, to.x), min(from.y, to.y))
+    private val stdTo   = XY(max(from.x, to.x), max(from.y, to.y))
+
+    // range / contains
+    fun xRange() = (stdFrom.x .. stdTo.x)
+    fun yRange() = (stdFrom.y .. stdTo.y)
+    fun contains(loc: XY) = (loc.x in xRange() && loc.y in yRange())
 }
 
 // a 2d mutable list of Booleans of dimensions xDim, yDim
@@ -103,6 +111,13 @@ class Mask(val xdim:Int, val ydim:Int, private val default:Boolean = false) {
     fun on(loc:XY)  = set(loc, true)
     fun off(loc:XY) = set(loc, false)
     fun tgl(loc:XY) = set(loc, !get(loc))
+
+    // same with individual coordinates
+    fun set(x:Int, y:Int, value:Boolean) { msk[y][x] = value }
+    fun get(x:Int, y:Int) = msk[y][x]
+    fun on(x:Int, y:Int)  = set(x, y, true)
+    fun off(x:Int, y:Int) = set(x, y, false)
+    fun tgl(x:Int, y:Int) = set(x, y, !get(x, y))
 }
 
 // a 2D integer map of dimensions xdim, ydim
