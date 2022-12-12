@@ -149,11 +149,13 @@ class MapInt(val xdim:Int, val ydim:Int, private val default:Int = 0) {
 
     // adds simple XY getter / setter
     fun get(xy:XY):Int = mp[xy.y][xy.x]
+    fun get(x:Int, y:Int) = mp[y][x]
     fun set(xy:XY, value:Int) { mp[xy.y][xy.x] = value }
+    fun set(x:Int, y:Int, value:Int) { mp[y][x] = value }
 
     // sets a line value
-    fun setLine(x:Int, ln:List<Int>) {
-       mp[x] = ln.toMutableList()
+    fun setLine(y:Int, ln:List<Int>) {
+       mp[y] = ln.toMutableList()
     }
 
     // prints out a representation to stdout
@@ -166,6 +168,46 @@ class MapChar(val xdim:Int, val ydim:Int, private val default:Char = '.') {
     // the actual map accessible with [y][x] sequence
     val mp = mutableListOf<MutableList<Char>>().apply { repeat(ydim) { this.add( MutableList(xdim) { default })} }
 
+}
+
+// a generic 2D map
+class Map<T>(val xdim:Int, val ydim:Int, private val default: (Int, Int) -> T) {
+
+    // the actual map accessible with [y][x] sequence
+    val mp = (0 until ydim).map{ y -> (0 until xdim).map { x -> default(x, y) }.toMutableList() }
+
+    // adds simple XY getter / setter
+    fun get(xy: XY): T = mp[xy.y][xy.x]
+    fun set(xy: XY, value: T) {
+        mp[xy.y][xy.x] = value
+    }
+
+    fun get(x: Int, y: Int): T = mp[y][x]
+    fun set(x: Int, y: Int, value: T) {
+        mp[y][x] = value
+    }
+
+    // sets content of a whole region using lambda (x,y)
+    fun set(op: (Int, Int) -> (T), bx: Rect = Rect(XY(0, 0), XY(xdim, ydim))) {
+        mp.forEachIndexed { y, ln ->
+            if (y in bx.yRange())
+                ln.forEachIndexed { x, vl ->
+                    if (x in bx.xRange())
+                        mp[y][x] = op(x, y)
+                }
+        }
+    }
+
+    // modifies content of a whole region using lambda (current value, x, y)
+    fun mod(op: (T, Int, Int) -> (T), bx: Rect = Rect(XY(0, 0), XY(xdim, ydim))) {
+        mp.forEachIndexed { y, ln ->
+            if (y in bx.yRange())
+                ln.forEachIndexed { x, vl ->
+                    if (x in bx.xRange())
+                        mp[y][x] = op(mp[y][x], x, y)
+                }
+        }
+    }
 }
 
 
