@@ -17,30 +17,30 @@ class Day12 : Solver {
             val inf = map.xdim * map.ydim * 10
             val optMap = Map(map.xdim, map.ydim) { x, y -> OptPnt(XY(x,y), inf, null) }
             val first = if (part == 1) start else end // for part 2, we start from the end
-            optMap.set(first, OptPnt(first,0, null))
+            optMap.set(first, OptPnt(first,0, null, true))
             val que = ArrayDeque(mutableListOf(optMap.get(first)))
             val boundingBox = Rect(XY(0,0),XY(map.xdim - 1 , map.ydim - 1))
 
             // BFS algorithm
             // Since the graph is not weighted (i.e. every move to another point has the same cost)
-            // there is no need to re-sort the queue since there are no better paths to a point already queued
+            // BFS ensures that every point is reached with min cost when seen the first time
             while (que.size > 0) {
                 val cur = que.removeFirst()
-                cur.vis = true
                 if ((part == 1 && cur.loc == end) ||                      // part 1: stop when reaching the end point
                     (part == 2 && map.get(cur.loc) == 0)) return cur.dist // part 2: stop when finding an 'a'
-                (0..3).forEach {
-                    val nextLoc = cur.loc.mv(it)
+                for (direction in 0..3) {
+                    val nextLoc = cur.loc.mv(direction)
                     if (boundingBox.contains(nextLoc) &&     // next point is on the map
                         !optMap.get(nextLoc).vis &&          // next point not yet visited
-                        (optMap.get(nextLoc).dist == inf) && // next point's distance not yet computed
                         ((part == 1 && map.get(nextLoc) < (map.get(cur.loc) + 2)) ||   // the climb-up limits for p1
-                         (part == 2 && map.get(nextLoc) > (map.get(cur.loc) - 2)))) {  // reverse climb limits for p2
-                                optMap.get(nextLoc).dist = cur.dist + 1
-                                optMap.get(nextLoc).prev = cur
-                                que.addLast(optMap.get(nextLoc))
+                                (part == 2 && map.get(nextLoc) > (map.get(cur.loc) - 2)))) {  // reverse for p2
+                        optMap.get(nextLoc).dist = cur.dist + 1
+                        optMap.get(nextLoc).vis  = true
+                        optMap.get(nextLoc).prev = cur
+                        que.add(optMap.get(nextLoc))
                     }
                 }
+
             }
             return inf
         }
