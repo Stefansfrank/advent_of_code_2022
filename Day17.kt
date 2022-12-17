@@ -38,6 +38,10 @@ class Day17 : Solver {
         // the front line is the height of the highest block in each of the seven columns relative to the highest
         fun hash(typ:Int, jet:Int, frnt:List<Int>):String = "$jet-$typ-${frnt.fold(""){s, i -> "$s$i|" }}"
 
+        // I also observe how many rocks fall for each cycle of jet commands. If this stabilizes periodically
+        // multiples of it are a good guess for the overall repetition of state
+        var jetFreq = 0
+
         // simulate the fall of n rocks
         fun simulate(n:Int):List<State> {
             // prep the cave
@@ -64,6 +68,11 @@ class Day17 : Solver {
             val states = mutableListOf<State>()
             val front = MutableList(7){ 0 }
 
+            // this will hold the amount of rocks added when the jet index is rolling over
+            // since there are multiple jets per fall, this helps computing how many rocks fall during one jet cycle
+            // this gives us the base for the repetition frequencies to look at later
+            var rollOver = 0
+
             // run the simulation
             for (ix in 0 until n) {
                 do {
@@ -76,7 +85,10 @@ class Day17 : Solver {
                     rLvl -= 1
 
                     // increment the jet
-                    jetIx = (jetIx + 1) % data.size
+                    if (jetIx == data.size - 1) {
+                        if (rollOver == 0) rollOver = states.size else if (jetFreq == 0) jetFreq = states.size - rollOver
+                        jetIx = 0
+                    } else jetIx++
 
                     // if that move down has crashed, stop falling and move back up
                 } while (!crash())
@@ -117,14 +129,16 @@ class Day17 : Solver {
             return(states)
         }
 
-        // I compute 500_000 rocks as I need a bit more for part 2
+        // I compute 40_000 rocks as I need a bit more for part 2
         // since I keep state, I can get part 1 just from the state table
-        val states = simulate(500_000)
+        // I estimated 40_000 since a previous run showed the jet frequency to be on the order of 2_000
+        val states = simulate(10_000)
         println("Part 1: $red$bold${states[2021].fill}$reset")
 
         // now try to find a frequency where the front line, rock type, and jet index i.e. the hash are the same
-        // looping through potential frequencies
-        freq@for (freq in 30 .. 100_000) {
+        // looping through potential frequencies by trying multiples of the above detected jet frequency
+        freq@for (freqMultiplier in 1..10) {
+            val freq = freqMultiplier * jetFreq
 
             // now loop over the states and try to find the first time a hash is repeated after the frequency
             // the limits are chosen based on the expectation that the first repetition happens within 10* frequency
