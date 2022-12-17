@@ -10,6 +10,9 @@ class Day17 : Solver {
         // reading input
         val data = readTxtFile(file)[0].toList()
 
+        // this is the list of the 5 rock types with helpful info to know how much
+        // they can be moved left/right before crashing into the wall and the
+        // default shift when they start
         data class Rock(val maxX: Int, val default: Int, val bits:List<Int>) {
             val height = bits.size
         }
@@ -22,12 +25,20 @@ class Day17 : Solver {
             Rock(5, 3, listOf(0b0000011, 0b0000011)),
         )
 
+        // prints a cave in a readable format
         fun caveDump(cv:List<Int>) {
             cv.forEach { println(it.toString(2).padStart(7, '0')) }
             println("-------")
         }
 
+        // the data structure of a solution - the fill level and a state hash
         data class State(val fill:Int, val hash:String)
+
+        // the hash function combines the index in the jet input, the last rock type and the front line
+        // the front line is the height of the highest block in each of the seven columns relative to the highest
+        fun hash(typ:Int, jet:Int, frnt:List<Int>):String = "$jet-$typ-${frnt.fold(""){s, i -> "$s$i|" }}"
+
+        // simulate the fall of n rocks
         fun simulate(n:Int):List<State> {
             // prep the cave
             val cave = mutableListOf(0b01111111)
@@ -49,12 +60,11 @@ class Day17 : Solver {
                 return false
             }
 
-            // prepare the state list
+            // prepare the state list and the front line for continuous computation
             val states = mutableListOf<State>()
             val front = MutableList(7){ 0 }
-            fun hash(typ:Int, jet:Int, frnt:List<Int>):String = "$jet-$typ-${frnt.fold(""){s, i -> "$s$i|" }}"
 
-            // rem 1_000_000_000_000
+            // run the simulation
             for (ix in 0 until n) {
                 do {
                     // move to the side and check whether it would be beyond the limits or crash into other rock
@@ -78,21 +88,23 @@ class Day17 : Solver {
                 fill = max(fill, rLvl + rock.height)
                 cave.addAll(List(fill + 7 - cave.size){0b0})
 
-                // move the relative front line
+                // move the existing relative front line down
                 (0 until 7).forEach { front[it] += (fill - oldFill) }
 
-                // actually add the rock permanently to the cave
+                // add the rock permanently to the cave
                 for ((bix,b) in rock.bits.withIndex()) {
                     val new = b shl xPos
                     cave[rLvl + bix] = cave[rLvl + bix] or new
 
-                    // add new rock to the relative front-line
+                    // add relevant new rock positions to the relative front-line
                     (0 until 7).forEach {
                         if ((1 shl it) and new > 0) {
                             front[it] = fill - rLvl - 1 - bix
                         }
                     }
                 }
+
+                // save the state for later analysis
                 states.add(State(fill-1, hash(rockTyp, jetIx, front)))
 
                 // increment and position the next rock
@@ -101,34 +113,33 @@ class Day17 : Solver {
                 rLvl = fill + 3
                 xPos = rock.default
 
-                //debug
-                //caveDump(cave)
-                //println("$fill - ${front}")
             }
             return(states)
         }
 
+        // I compute 500_000 rocks as I need a bit more for part 2
+        // since I keep state, I can get part 1 just from the state table
         val states = simulate(500_000)
         println("Part 1: $red$bold${states[2021].fill}$reset")
 
-        // now try to find a frequency where the front line, rock type, and jet index are the same
+        // now try to find a frequency where the front line, rock type, and jet index i.e. the hash are the same
         // looping through potential frequencies
         freq@for (freq in 30 .. 100_000) {
 
-            // now loop over the states and try to find the first time this happens by comparing the hash
-            // the limits are chosen in a way that I'd expect the first repetition to happen within 10* frequency
+            // now loop over the states and try to find the first time a hash is repeated after the frequency
+            // the limits are chosen based on the expectation that the first repetition happens within 10* frequency
             for (ix in 1 until min(states.size - freq, freq*10)) {
 
-                // this is hit!
+                // this is a hit - we cracked it!
                 if (states[ix].hash == states[ix+freq].hash) {
 
                     // compute the fill that is added for each repetitive period
                     val delta = states[ix+freq].fill - states[ix].fill
 
-                    // and use integer division and modulo and such to construct the fill level
+                    // use integer division and modulo and such to construct the total fill level
                     val test  = 1_000_000_000_000L - ix
                     var total = (test / freq) * delta
-                    total += states[(test % freq).toInt() + ix - 1].fill // combines the first and last bit
+                    total += states[(test % freq).toInt() + ix - 1].fill // combines the first and last odd bit
                     println("Part 2: $red$bold${total}$reset")
                     return
                 }
