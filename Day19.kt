@@ -87,6 +87,7 @@ class Day19 : Solver {
 
                 var prods = listOf(ProdLog(blup)) // the BFS queue - replaced after each minute
                 var maxGeo = 0
+                var maxObs = 0
                 for (min in 1..mins) {
                     val newProds = mutableListOf<ProdLog>() // the BFS queue for the next minute
                     for (prod in prods) {
@@ -112,11 +113,13 @@ class Day19 : Solver {
 
                         newProds.add(prod)
                         maxGeo = max(maxGeo, prod.res.geo)
+                        maxObs = max(maxObs, prod.res.obs)
                     }
 
                     // another optimization - if there are already geodes produced, discard all solutions that
-                    // are behind the best solution by 2 or more geodes
-                    prods = newProds.filter { maxGeo - it.res.geo <= 2 }
+                    // are behind the best solution by 2 or more geodes - also discard solutions where obsidian
+                    // lags behind
+                    prods = newProds.filter { maxGeo - it.res.geo <= 2 || maxObs - it.res.obs <= 2}
                 }
                 result.add(maxGeo)
                 println("Blueprint ${blup.id} over $mins minutes. Best result: $maxGeo geodes.")
