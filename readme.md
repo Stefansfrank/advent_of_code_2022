@@ -10,6 +10,8 @@ I have some reusable code blocks but did not encapsulate them into libraries so 
 - ```2D.kt``` for points, maps, masks and other often used stuff for 2D geometry
 - ```Ansi.kt``` for ANSI codes to pretty print my results :)
 - ```Rng.kt``` developed for the 2022 AoC for handling arithmetics (unions, overaps etc.) on ranges defined only by their from/to limit values
+- ```3D.kt``` helping with 3D points and such
+- ```LinkedList.kt``` helping with linked lists
 
 You can directly use the ```solve``` function on every day by renaming it to main() followed by declaring the file name of the input as ```val file = "xx"```. If you use main in AoC2022 and provide the number of the day and the dataset name as I do (my convention for the file naming of data files is ```d<n>.<dataset>.txt``` with ```<dataset>``` either "input" or "test"), you might need to change the build script to add reflection (I had to do that in IntelliJ). I added that since I work on different days on multiple computers and this allows things to run without all days being present.
   
