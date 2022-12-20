@@ -7,6 +7,7 @@ class Day20 : Solver {
     override fun solve(file: String) {
         
         // sets the prev/next links on the Links with the order given in data
+        // returns the element with value 0L
         fun crossLink(data:List<Link>):Link {
             val dlen = data.size
             var ret = data[0]
@@ -50,7 +51,7 @@ class Day20 : Solver {
         zero = crossLink(data)
         move(10,data)
 
-        print("Part 1: $red$bold")
+        print("Part 2: $red$bold")
         print(zero.atFw(1000 % dlen).value + zero.atFw(2000 % dlen).value + zero.atFw(3000 % dlen).value)
         println(reset)
     }
