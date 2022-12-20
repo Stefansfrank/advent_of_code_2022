@@ -3,7 +3,7 @@ package com.sf.aoc
 // a double linked list with a Long value
 data class Link(val value:Long, var next:Link?, var prev:Link?) {
 
-    // take this element out of the chain (leaving it's prev/next untouched)
+    // take this element out of the chain (leaving its own prev/next untouched)
     fun takeOut() {
         next?.prev = prev
         prev?.next = next
@@ -38,8 +38,8 @@ data class Link(val value:Long, var next:Link?, var prev:Link?) {
         return ret
     }
 
-    // overriding toString since it runs into stack overflow otherwise
+    // overriding toString since it runs into stack overflow for a cyclic list
     override fun toString(): String {
-        return "[$value,P:${prev?.value},N:${next?.value}]"
+        return "[value: $value ,Prev:${prev?.value} ,Next:${next?.value} ]"
     }
 }
