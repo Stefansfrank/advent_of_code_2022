@@ -14,8 +14,8 @@ class Day21 : Solver {
         // I wanted to understand class inheritance in Kotlin
         // thus I created a bunch of classes describing monkeys
         abstract class Monkey (val typ:Boolean) {
-            abstract fun eval():Double
-            open fun setVal(n: Double) {}
+            abstract fun eval():Long
+            open fun setVal(n: Long) {}
             open fun get1(): String = ""
             open fun get2(): String = ""
         }
@@ -26,9 +26,9 @@ class Day21 : Solver {
             override fun get2():String = op2
         }
 
-        class Val(var value:Double):Monkey(true) {
+        class Val(var value:Long):Monkey(true) {
             override fun eval() = value
-            override fun setVal(n:Double) { value = n }
+            override fun setVal(n:Long) { value = n }
         }
 
         class Add(override val op1:String, override val op2:String,
@@ -64,7 +64,7 @@ class Day21 : Solver {
                     "/" -> dir[mm[1]] = Div(mm[2], mm[4], dir)
                 }
            } else dir[ln.substringBefore(':')] =
-                    Val(ln.substringAfter(':').trim().toDouble())
+                    Val(ln.substringAfter(':').trim().toLong())
         }
 
         // Part1: the recursive eval is super simple
@@ -72,39 +72,40 @@ class Day21 : Solver {
 
         // Part 2
         // helper computes the difference between the two operands of "root" with n as "humn"
-        fun diff(n:Double):Double {
+        fun diff(n:Long):Long {
             dir["humn"]!!.setVal(n)
             return dir[dir["root"]!!.get1()]!!.eval() -
                     dir[dir["root"]!!.get2()]!!.eval()
         }
 
         // the sign of the original difference between the two operands of "root"
-        val baseSign = diff(0.0).sign
+        val baseSign = diff(0L).sign
 
         // detects whether the guesses should be positive or negative
         // building on monotone dependence between the difference and the "humn" value
-        var guess = (abs(diff(0.0)) - abs(diff(10.0))).sign * 10
+        var guess = (abs(diff(0L)) - abs(diff(10L))).sign * 10L
 
         // detect the amount of digits needed to flip the sign and sets the starting guess
         while (diff(guess).sign == baseSign) guess *= 10
+        var sum = guess
         guess /= 10
-        val digits = log10(guess).toInt()
+        val digits = log10(guess.toDouble()).toInt()
 
         // now try to count up each digit starting with the highest until the sign flips
-        var sum = guess
+        // there will be multiple solution due to integer division and I want the smallest
+        var solution = 0L
         dig@for (d in digits downTo 0) {
+            sum /= 10
             for (s in 1 .. 9) {
                 guess += sum
                 val nSig = diff(guess).sign
-                if (nSig == 0.0) break@dig // found the solution
-                if (nSig != baseSign) {    // the sign has flipped
+                if (nSig != baseSign) {
+                    if (nSig == 0) solution = guess
                     guess -= sum
-                    sum /= 10
                     continue@dig
                 }
             }
-            sum /= 10 // the sign hasn't flipped (i.e. 9 is the digit)
         }
-        println("Part 2: $red$bold${guess.toLong()}$reset")
+        println("Part 2: $red$bold${solution}$reset")
     }
 }
