@@ -40,7 +40,6 @@ class Day23 : Solver {
             // proposal stage
             data class Prop(var valid:Boolean, val elf:XY)
             val props = mutableMapOf<XY, Prop>()
-            var moved = false
             elfs.forEach {
                 val prop = prop(it)
                 if (prop != null) {
@@ -53,6 +52,7 @@ class Day23 : Solver {
             }
 
             // the move
+            var moved = false
             props.forEach { (ploc, prop) -> if (prop.valid) moved = move(prop.elf, ploc) }
 
             // rotate global direction sequence
