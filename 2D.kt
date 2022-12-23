@@ -54,6 +54,9 @@ data class Rect(val from:XY, val to:XY) {
     fun xRange() = (stdFrom.x .. stdTo.x)
     fun yRange() = (stdFrom.y .. stdTo.y)
     fun contains(loc: XY) = (loc.x in xRange() && loc.y in yRange())
+
+    // size
+    fun size() = abs((1L + to.y - from.y) *(1L + to.x - from.x))
 }
 
 // a 2d mutable list of Booleans of dimensions xDim, yDim
