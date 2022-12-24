@@ -11,6 +11,8 @@ data class XY(val x: Int, val y: Int) {
     // adds a vector to a point
     fun add(p:XY) = XY(x + p.x, y + p.y)
     fun sub(p:XY) = XY( x - p.x, y - p.y)
+    fun add(px:Int, py:Int) = XY(x + px, y + py)
+    fun sub(px:Int, py:Int) = XY( x - px, y - py)
 
     // returns the next point in the given direction
     // (0 = up, 1 = right, 2 = down, 3 = left)
@@ -61,10 +63,18 @@ data class Rect(val from:XY, val to:XY) {
 
 // a 2d mutable list of Booleans of dimensions xDim, yDim
 // used for positive coordinate systems starting at 0,0
-class Mask(val xdim:Int, val ydim:Int, private val default:Boolean = false) {
+class Mask(val xdim:Int, val ydim:Int, private val default:Boolean = false,
+           private val defMsk:MutableList<MutableList<Boolean>>? = null) {
+
+    // constructor using another mask as template
+    constructor(temp:Mask): this(temp.xdim, temp.ydim, false,
+        mutableListOf<MutableList<Boolean>>().apply {
+            for (y in 0 until temp.ydim) { this.add( temp.msk[y].toMutableList() )}})
 
     // the underlying mask accessible with [y][x] sequence
-    val msk = mutableListOf<MutableList<Boolean>>().apply { repeat(ydim) { this.add( MutableList(xdim) { default })} }
+    val msk = defMsk
+        ?: mutableListOf<MutableList<Boolean>>().apply {
+            repeat(ydim) { this.add( MutableList(xdim) { default })} }
 
     // sets a whole region to true (default - whole mask)
     fun on(bx: Rect = Rect(XY(0,0), XY(xdim, ydim))) {
@@ -111,6 +121,8 @@ class Mask(val xdim:Int, val ydim:Int, private val default:Boolean = false) {
     // simple getters and setters using XY as coordinates
     fun set(loc:XY, value:Boolean) { msk[loc.y][loc.x] = value }
     fun get(loc:XY) = msk[loc.y][loc.x]
+    fun getSafe(loc:XY, nul:Boolean) =
+        if (loc.x in 0 until xdim && loc.y in 0 until ydim) msk[loc.y][loc.x] else nul
     fun on(loc:XY)  = set(loc, true)
     fun off(loc:XY) = set(loc, false)
     fun tgl(loc:XY) = set(loc, !get(loc))
