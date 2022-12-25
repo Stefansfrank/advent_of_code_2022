@@ -37,7 +37,7 @@ class Day25: Solver {
         repeat(30) {
             result[digit] += sum % 5
             // that's the line taking care of the specialty here ...
-            if (result[digit] > 2L) { result[digit] -= 5L; result[digit+1] = result[digit+1] + 1 }
+            if (result[digit] > 2L) { result[digit] -= 5L; result[digit+1] = 1 }
             sum /= 5
             digit ++
         }
